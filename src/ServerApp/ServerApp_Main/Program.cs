@@ -1,4 +1,5 @@
-﻿using ServerApp_Main.Modules.DBModule;
+﻿using ServerApp_Main.Modules.Configuration;
+using ServerApp_Main.Modules.DBModule;
 using ServerApp_Main.Modules.WebServerModule;
 using ServerApp_Main.Utils;
 using System.Reflection;
@@ -29,6 +30,9 @@ namespace ServerApp_Main
         {
             try
             {
+                bool init_config = await InitSingle(ConfigMain.InitAsync, "Initializing Configuration", "Failed to initialize Configuration");
+                if (!init_config) return false;
+
                 bool init_webserver = await InitSingle(WebServerMain.InitAsync, "Initializing WebServer", "Failed to initialize WebServer");
                 if (!init_webserver) return false;
 

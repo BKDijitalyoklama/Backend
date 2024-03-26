@@ -9,20 +9,20 @@ using System.Threading.Tasks;
 namespace ServerApp_Main.Modules.Configuration
 {
 
-    public class Configuration
+    public class Config
     {
-
+        public string? WebServerUrl { get; set; }
     }
 
     internal static class ConfigMain
     {
-        public static Configuration? config;
+        public static Config? config;
 
         public static async Task<bool> InitAsync()
         {
             try
             {
-                config = Newtonsoft.Json.JsonConvert.DeserializeObject<Configuration>(await System.IO.File.ReadAllTextAsync("config.json"));
+                config = Newtonsoft.Json.JsonConvert.DeserializeObject<Config>(await System.IO.File.ReadAllTextAsync(Paths.Config_FPath));
             }
             catch(Exception ex)
             {

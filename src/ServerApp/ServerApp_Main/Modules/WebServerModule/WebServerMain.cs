@@ -17,7 +17,8 @@ namespace ServerApp_Main.Modules.WebServerModule
 
         public static async Task<bool> InitAsync()
         {
-            server = new WebServer("http://localhost:8080/");
+            server = new WebServer(Configuration.ConfigMain.config?.WebServerUrl);
+            server.AddController<LogsController>();
             server.AddController<MiscController>();
             server.Start();
             return true;

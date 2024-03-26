@@ -8,38 +8,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServerApp_Main.Modules.DBModule
+namespace ServerApp_Main.Modules.DBModule.Wrappers
 {
-
-    internal static class Wrapper
+    internal static partial class Wrapper
     {
-        public static class UserOperations
-        {
-            public static async Task<User?> GetUserByIDAsync(uint userID)
-            {
-                try
-                {
-                    if (DBMain.MainDBConnection == null) { Logger.Log("DB Not initialized", Logger.LogLevel.Error); return null; }
-                    User user = await DBMain.MainDBConnection.GetAsync<User>(userID);
-                    return user;
-                }
-                catch (SQLite.SQLiteException e)
-                {
-                    if (e.Result != SQLite3.Result.NotFound) Logger.Log("DBErr: " + e.Message, Logger.LogLevel.Error);
-                    return null;
-                }
-                catch(Exception ex)
-                {
-                    Logger.Log("Err: " + ex.Message, Logger.LogLevel.Error);
-                    return null;
-                }
-            }
-        }
 
-        public static class EntryLogOperations
+        public static class Entrylogs
         {
 
-            public static async Task EstablishDailyDBConnection()
+            public static async Task EstablishDailyDBConnectionAsync()
             {
                 try
                 {
@@ -68,11 +45,11 @@ namespace ServerApp_Main.Modules.DBModule
                 }
             }
 
-            public static async Task<bool> NewEntryLog(EntryLog elog)
+            public static async Task<bool> NewEntryLogAsync(EntryLog elog)
             {
                 try
                 {
-                    await EstablishDailyDBConnection();
+                    await EstablishDailyDBConnectionAsync();
                     if (DBMain.DailyEntryLogConnection == null) { Logger.Log("DB Not initialized", Logger.LogLevel.Error); return false; }
 
                     return await DBMain.DailyEntryLogConnection.InsertAsync(elog) == 1;
@@ -88,8 +65,8 @@ namespace ServerApp_Main.Modules.DBModule
                     return false;
                 }
             }
-        }
-
         
+        
+        }
     }
 }
