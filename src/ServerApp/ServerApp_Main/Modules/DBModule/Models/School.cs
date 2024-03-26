@@ -11,10 +11,12 @@ namespace ServerApp_Main.Modules.DBModule.Models
     internal class School
     {
         [PrimaryKey]
-        public int SchoolID { get; set; }
+        [AutoIncrement]
+        public uint SchoolID { get; set; }
 
-        public byte[] DeviceMACAddress { get; set; }
+        [Indexed]
+        public byte[] DeviceMACAddress { get; set; } = { };
 
-        public string SchoolName { get; set; }
+        public string SchoolName { get; set; } = "";
     }
 }

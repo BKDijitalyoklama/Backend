@@ -13,7 +13,10 @@ namespace ServerApp_Main.Modules.DBModule.Models
         [PrimaryKey]
         public uint ID { get; set; }
 
-        public string NameSurname { get; set; }
+        [Indexed]
+        public uint SchoolID { get; set; }
+
+        public string NameSurname { get; set; } = "";
 
         public DateTime UserCreationDT { get; set; }
     }

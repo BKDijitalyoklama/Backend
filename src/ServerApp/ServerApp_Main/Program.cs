@@ -11,9 +11,11 @@ namespace ServerApp_Main
         {
             Logger.Log("APP Started, Initializing");
 
-            while(!await InitModules())
+            if (!await InitModules())
             {
-                Logger.Log("Initializing failed, restarting", Logger.LogLevel.Error);
+                Logger.Log("Initializing failed", Logger.LogLevel.Error);
+                Console.ReadLine();
+                return;
             }
 
             Logger.Log("Initialization complete", Logger.LogLevel.Init);
@@ -25,11 +27,19 @@ namespace ServerApp_Main
 
         static async Task<bool> InitModules()
         {
-            bool init_webserver = await InitSingle(WebServerMain.InitAsync, "Initializing WebServer", "Failed to initialize WebServer");
-            if (!init_webserver) return false;
+            try
+            {
+                bool init_webserver = await InitSingle(WebServerMain.InitAsync, "Initializing WebServer", "Failed to initialize WebServer");
+                if (!init_webserver) return false;
 
-            bool init_db = await InitSingle(DBMain.InitAsync, "Initializing WebServer", "Failed to initialize WebServer");
-            if (!init_webserver) return false;
+                bool init_db = await InitSingle(DBMain.InitAsync, "Initializing DB", "Failed to initialize DB");
+                if (!init_db) return false;
+            }
+            catch(Exception ex)
+            {
+                Logger.Log("Exception during initialization: " + ex.Message, Logger.LogLevel.Error);
+                return false;
+            }
 
             return true;
 

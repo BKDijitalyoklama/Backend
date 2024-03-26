@@ -13,6 +13,8 @@ namespace ServerApp_Main.Modules.DBModule.Models
         [PrimaryKey]
         public uint UserID { get; set; }
 
+        public uint SchoolID { get; set; }
+
         public DateTime DT { get; set; }
 
 
