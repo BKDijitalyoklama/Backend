@@ -1,11 +1,10 @@
 #include <Arduino.h>
 #include "Debugger.h"
 #include "Pinout.h"
-#include "DataSaving/Users.h"
 #include "EntryHandler.h"
 #include "DataSaving/Config.h"
-#include "Report/ReportHandler.h"
 #include "Network/NetworkConnection.h"
+#include "Feedback/LCD.h"
 
 namespace RFIDReader
 {
@@ -15,10 +14,6 @@ namespace RFIDReader
         if(memcmp(cardID, Config::SCard_IP, 3) == 0)
         {
             NetworkConnection::DisplayIPAddr();
-        }
-        else if(memcmp(cardID, Config::SCard_CreateReport, 3) == 0)
-        {
-            ReportHandler::CreateReport();
         }
         else if(memcmp(cardID, Config::SCard_Restart, 3) == 0)
         {

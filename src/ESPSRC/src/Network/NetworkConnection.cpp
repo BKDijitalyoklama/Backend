@@ -29,6 +29,7 @@ namespace NetworkConnection
         if(WiFi.status() == WL_CONNECTED)
         {
             DebugInfo("WiFi connected // IP: " + WiFi.localIP().toString());
+            DebugInfo("MAC: " + String(WiFi.macAddress()));
             return true;
         }
         else

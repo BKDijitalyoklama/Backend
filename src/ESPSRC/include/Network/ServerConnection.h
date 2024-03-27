@@ -8,16 +8,15 @@
 
 namespace ServerConnection
 {
-    struct EntryLogResponse
+
+    enum EntryLogResult
     {
-        bool success;
-        int code;
-
-        String namesurname;
-        bool isEntry;
+        ENTRYSUCCESS,
+        USERNOTFOUND,
+        COOLDOWN,
+        ERROR
     };
-    
 
-    EntryLogResponse NewEntrylog(uint8_t id[3]);
+    EntryLogResult NewEntrylog(uint8_t id[3]);
     
 }

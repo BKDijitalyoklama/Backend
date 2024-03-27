@@ -5,6 +5,7 @@ struct NetworkCredentials
 {
     String SSID;
     String PASSWORD;
+
 };
 
 namespace Config

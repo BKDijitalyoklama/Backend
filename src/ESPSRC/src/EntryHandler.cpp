@@ -1,13 +1,9 @@
 #include <Arduino.h>
-#include "DataSaving/EntryLogs.h"
-#include "DataSaving/Users.h"
 #include "Debugger.h"
 #include "Feedback/LCD.h"
 #include "AsyncDelay.h"
 #include "ESPAsyncWebServer.h"
-#include "DataSaving/EntryLogs.h"
 #include "Feedback/Buzzer.h"
-#include "DataSaving/DevLogs.h"
 #include "Network/ServerConnection.h"
 
 namespace EntryHandler
@@ -22,36 +18,36 @@ namespace EntryHandler
         DebugInfo("ManID: " + String(manufacturerID) + " UID: " + String(UID));
         #endif
 
-        User user = User();
+        LCD::PrintCenter("Lutfen Bekleyin...");
 
-        ServerConnection::EntryLogResponse result = ServerConnection::NewEntrylog(cardid);
+        ServerConnection::EntryLogResult result = ServerConnection::NewEntrylog(cardid);
 
-        if(!result.success || result.code == 500)
+        if(result == ServerConnection::EntryLogResult::ERROR)
         {
             DebugError("Couldn't save user entry to server");
             return;
         }
 
-        if(result.code == 404)
+        if(result == ServerConnection::EntryLogResult::USERNOTFOUND)
         {
             LCD::PrintCenter("Gecersiz Kart");
             delay(1000);
             return;
         }
 
-        if(suc)
+        if(result == ServerConnection::EntryLogResult::ENTRYSUCCESS)
         {
-            LCD::PrintCenterRow((char*)user.Name, 0);
-            LCD::PrintCenterRow("Kaydedildi", 1);
+            LCD::Clear();
+            LCD::PrintCenterRow("Kaydedildi", 0);
             Buzzer::Play_UserEntrySound();
+            delay(2000);
+            return;
         }
         else
         {
-            
-            DevLogs::Create("Error Saving User Entry: " + String((int)UID));
-            DebugError("Couldn't save user entry");
+            LCD::PrintCenter("Hata Olustu, Tekrar deneyin");
         }
-
+        
         delay(2000);
     }
 }

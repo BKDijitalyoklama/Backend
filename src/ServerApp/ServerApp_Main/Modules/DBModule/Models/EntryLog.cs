@@ -10,7 +10,7 @@ namespace ServerApp_Main.Modules.DBModule.Models
     [Table("entrylogs")]
     internal class EntryLog
     {
-        [PrimaryKey]
+        [Indexed]
         public uint UserID { get; set; }
 
         public uint SchoolID { get; set; }

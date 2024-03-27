@@ -14,6 +14,9 @@ namespace ServerApp_Main.Modules.DBModule.Models
         public uint ID { get; set; }
 
         [Indexed]
+        public byte SubjectID { get; set; }
+
+        [Indexed]
         public uint SchoolID { get; set; }
 
         public string NameSurname { get; set; } = "";

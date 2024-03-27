@@ -32,6 +32,12 @@ namespace ServerApp_Main.Modules.DBModule.Wrappers
 
                         DBMain.DailyEntryLogConnection = conn;
                     }
+
+                    if(DBMain.DailyEntryLogConnection == null)
+                    {
+                        DBMain.DailyEntryLogConnection = new SQLiteAsyncConnection(todaysFile);
+                        await DBMain.DailyEntryLogConnection.CreateTableAsync<EntryLog>();
+                    }
                 }
                 catch (SQLite.SQLiteException e)
                 {
@@ -66,7 +72,26 @@ namespace ServerApp_Main.Modules.DBModule.Wrappers
                 }
             }
         
-        
+            public static async Task<(bool, bool)> UserHasCooldown()
+            {
+                try
+                {
+                    await EstablishDailyDBConnectionAsync();
+                    if (DBMain.DailyEntryLogConnection == null) { Logger.Log("DB Not initialized", Logger.LogLevel.Error); return (false, false); }
+
+                    return (true, (await DBMain.DailyEntryLogConnection.Table<EntryLog>().CountAsync(x => x.DT > DateTime.Now - TimeSpan.FromMinutes(1))) > 0);
+                }
+                catch (SQLite.SQLiteException e)
+                {
+                    Logger.Log("DBErr: " + e.Message, Logger.LogLevel.Error);
+                    return (false, false);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("Err: " + ex.Message, Logger.LogLevel.Error);
+                    return (false, false);
+                }
+            }
         }
     }
 }

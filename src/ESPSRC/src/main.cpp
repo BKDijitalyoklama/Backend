@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include "Debugger.h"
-#include "DataSaving/DataSaving.h"
 #include "RFIDReader.h"
 #include "Network/NetworkConnection.h"
 #include "Feedback/LCD.h"
@@ -8,11 +7,8 @@
 #include "AsyncDelay.h"
 #include "Network/HTTPServer.h"
 #include "DataSaving/Config.h"
-#include "DataSaving/Users.h"
-#include "Report/ReportHandler.h"
 #include "Network/MailSender.h"
 #include "Feedback/Buzzer.h"
-#include "DataSaving/DevLogs.h"
 
 void InitSingle(bool (*initFunc)(), const char* loadingText, const char* errorText)
 {
@@ -20,7 +16,6 @@ void InitSingle(bool (*initFunc)(), const char* loadingText, const char* errorTe
   bool suc = initFunc();
   if (!suc)
   {
-    DevLogs::Create(errorText);
 
     LCD::PrintCenter(errorText);
     delay(3000);
@@ -44,7 +39,6 @@ void setup()
 
   //InitSingle(DataSaving::Initialize, "SD Kart Yukleniyor", "SD Kart Hatasi");
 
-  DevLogs::Create("Begin");
 
   InitSingle(Config::Initialize, "Konfigrasyon Aliniyor", "Konfigrasyon Hatasi");
 
@@ -65,7 +59,6 @@ void setup()
   //datetimeUpdateTimer.start(1000 * 60 * 60, AsyncDelay::MILLIS);
   
   DebugInfo("Started");
-  DevLogs::Create("Started");
   Buzzer::Note(1000);
   LCD::PrintCenter("Kart Bekleniyor");
 }

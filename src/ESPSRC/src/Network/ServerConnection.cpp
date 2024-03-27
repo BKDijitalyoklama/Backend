@@ -13,7 +13,7 @@ namespace ServerConnection
         bool success;
     };
 
-    const char* root = "http://0.0.0.0";
+    const char* root = "http://10.134.100.16:80";
 
     String GetMacAddress()
     {
@@ -36,9 +36,8 @@ namespace ServerConnection
         int code = client.GET();
 
         if(code <= 0)
-        if(!client.begin(root + path))
         {
-            DebugError("Failed to connect to server");
+            DebugError("Code: " + String(code));
             return { "", 0, false };
         }
 
@@ -54,9 +53,8 @@ namespace ServerConnection
 
 
 
-    EntryLogResponse NewEntrylog(uint8_t idbytes[3])
+    EntryLogResult NewEntrylog(uint8_t idbytes[3])
     {
-        EntryLogResponse resp;
 
         uint id = idbytes[0] << 16 | idbytes[1] << 8 | idbytes[2];
 
@@ -64,13 +62,16 @@ namespace ServerConnection
 
         RequestResponse response = GETRequest(path);
 
-        resp.code = response.code;
-        resp.success = response.success;
+        if(response.code == 500 || response.code <= 0 || !response.success) return EntryLogResult::ERROR; 
 
-        resp.isEntry = response.code == 200;
-        resp.namesurname = response.data;
+        if(response.code == 404) return EntryLogResult::USERNOTFOUND;
 
-        return resp;
+        if(response.code == 201) return EntryLogResult::COOLDOWN;
+
+        if(response.code == 200) return EntryLogResult::ENTRYSUCCESS;
+        
+
+        return EntryLogResult::ERROR;
     }
 
     

@@ -8,7 +8,7 @@ namespace ServerApp_Main.Modules.Configuration
 {
     internal static class Paths
     {
-        public static string Files_DPath => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "files");
+        public static string Files_DPath => @"C:\BKDijitalYoklama_files";
 
         public static string MainDB_FPath => Path.Combine(Files_DPath, "main.db");
 
