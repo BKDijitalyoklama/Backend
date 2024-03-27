@@ -21,7 +21,28 @@ namespace ServerApp_Main.Modules.DBModule.Wrappers
                 {
                     if (DBMain.MainDBConnection == null) { Logger.Log("DB Not initialized", Logger.LogLevel.Error); return (false, null); }
                     School? school = await DBMain.MainDBConnection.Table<School>().FirstOrDefaultAsync(x => x.DeviceMACAddress == macID);
-                    
+
+                    return (true, school);
+                }
+                catch (SQLite.SQLiteException e)
+                {
+                    Logger.Log("DBErr: " + e.Message, Logger.LogLevel.Error);
+                    return (false, null);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("Err: " + ex.Message, Logger.LogLevel.Error);
+                    return (false, null);
+                }
+            }
+
+            public static async Task<(bool, School?)> GetSchoolByID(uint ID)
+            {
+                try
+                {
+                    if (DBMain.MainDBConnection == null) { Logger.Log("DB Not initialized", Logger.LogLevel.Error); return (false, null); }
+                    School? school = await DBMain.MainDBConnection.Table<School>().FirstOrDefaultAsync(x => x.SchoolID == ID);
+
                     return (true, school);
                 }
                 catch (SQLite.SQLiteException e)

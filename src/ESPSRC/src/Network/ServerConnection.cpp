@@ -24,7 +24,7 @@ namespace ServerConnection
         return String(baseMacChr);
     }
 
-    RequestResponse GETRequest(String path)
+    RequestResponse GETRequest(String path, byte timeoutSeconds = 5)
     {
         HTTPClient client;
         if(!client.begin(root + path))
@@ -32,6 +32,8 @@ namespace ServerConnection
             DebugError("Failed to connect to server");
             return { "", 0, false };
         }
+
+        client.setTimeout(timeoutSeconds * 1000);
 
         int code = client.GET();
 
@@ -48,6 +50,9 @@ namespace ServerConnection
         resp.code = code;
         resp.data = client.getString();
 
+        client.end();
+
+
         return resp;
     }
 
@@ -62,16 +67,16 @@ namespace ServerConnection
 
         RequestResponse response = GETRequest(path);
 
-        if(response.code == 500 || response.code <= 0 || !response.success) return EntryLogResult::ERROR; 
+        if(response.code == 500 || response.code <= 0 || !response.success) return EntryLogResult(EntryLogResult::ERROR, "");
 
-        if(response.code == 404) return EntryLogResult::USERNOTFOUND;
+        if(response.code == 404) return EntryLogResult(EntryLogResult::USERNOTFOUND, "");
 
-        if(response.code == 201) return EntryLogResult::COOLDOWN;
+        if(response.code == 210) return EntryLogResult(EntryLogResult::COOLDOWN, "");
 
-        if(response.code == 200) return EntryLogResult::ENTRYSUCCESS;
+        if(response.code == 200) return EntryLogResult(EntryLogResult::ENTRYSUCCESS, response.data);
         
 
-        return EntryLogResult::ERROR;
+        return EntryLogResult(EntryLogResult::ERROR, "");
     }
 
     

@@ -15,6 +15,10 @@ namespace ServerApp_Main.Modules.DBModule.Wrappers
 
         public static class Entrylogs
         {
+            private static string GetEntryLogDBPath(DateTime? date = null)
+            {
+                return Path.Combine(Paths.Entrylogs_DPath, (date ?? DateTime.Now).ToString("dd-MM-yyyy") + ".db");
+            }
 
             public static async Task EstablishDailyDBConnectionAsync()
             {
@@ -22,7 +26,7 @@ namespace ServerApp_Main.Modules.DBModule.Wrappers
                 {
                     DateTime today = DateTime.Now;
 
-                    string todaysFile = Path.Combine(Paths.Entrylogs_DPath, today.ToString("dd-MM-yyyy") + ".db");
+                    string todaysFile = GetEntryLogDBPath();
 
                     if (!File.Exists(todaysFile))
                     {
@@ -33,7 +37,7 @@ namespace ServerApp_Main.Modules.DBModule.Wrappers
                         DBMain.DailyEntryLogConnection = conn;
                     }
 
-                    if(DBMain.DailyEntryLogConnection == null)
+                    if (DBMain.DailyEntryLogConnection == null)
                     {
                         DBMain.DailyEntryLogConnection = new SQLiteAsyncConnection(todaysFile);
                         await DBMain.DailyEntryLogConnection.CreateTableAsync<EntryLog>();
@@ -50,6 +54,48 @@ namespace ServerApp_Main.Modules.DBModule.Wrappers
                     return;
                 }
             }
+
+
+
+            public static async Task<(bool, List<EntryLog>?)> GetEntryLogs(uint schoolID, DateTime? __date = null)
+            {
+                if (DBMain.MainDBConnection == null) { Logger.Log("DB DailyLogs Not initialized", Logger.LogLevel.Error); return (false, null); }
+
+                try
+                {
+
+                    DateTime date = __date ?? DateTime.Now;
+
+                    SQLiteAsyncConnection? conn;
+                    bool closeConn = false;
+
+                    if (date >= DateTime.Today)
+                    {
+                        await EstablishDailyDBConnectionAsync();
+                        if (DBMain.DailyEntryLogConnection == null) { Logger.Log("DB DailyLogs Not initialized", Logger.LogLevel.Error); return (false, null); }
+                        conn = DBMain.DailyEntryLogConnection;
+                    }
+                    else
+                    {
+                        conn = new SQLiteAsyncConnection(GetEntryLogDBPath(date), SQLiteOpenFlags.Create | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.ReadWrite);
+                        closeConn = true;
+                        await conn.CreateTableAsync<EntryLog>();
+                    }
+
+                    List<EntryLog> entryLogs = await conn.Table<EntryLog>().Where(x => x.SchoolID == schoolID).ToListAsync();
+
+                    if (closeConn) await conn.CloseAsync();
+
+                    return (true, entryLogs);
+                }
+                catch(Exception ex)
+                {
+                    Logger.Log("Err: " + ex.Message, Logger.LogLevel.Error);
+                    return (false, null);
+                }
+
+            }
+
 
             public static async Task<bool> NewEntryLogAsync(EntryLog elog)
             {
@@ -78,8 +124,8 @@ namespace ServerApp_Main.Modules.DBModule.Wrappers
                 {
                     await EstablishDailyDBConnectionAsync();
                     if (DBMain.DailyEntryLogConnection == null) { Logger.Log("DB Not initialized", Logger.LogLevel.Error); return (false, false); }
-
-                    return (true, (await DBMain.DailyEntryLogConnection.Table<EntryLog>().CountAsync(x => x.DT > DateTime.Now - TimeSpan.FromMinutes(1))) > 0);
+                    DateTime limit = DateTime.Now - TimeSpan.FromMinutes(1);
+                    return (true, (await DBMain.DailyEntryLogConnection.Table<EntryLog>().CountAsync(x => x.DT > limit)) > 0);
                 }
                 catch (SQLite.SQLiteException e)
                 {

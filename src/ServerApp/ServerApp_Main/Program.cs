@@ -1,5 +1,6 @@
 ﻿using ServerApp_Main.Modules.Configuration;
 using ServerApp_Main.Modules.DBModule;
+using ServerApp_Main.Modules.ReportBuilderModule;
 using ServerApp_Main.Modules.WebServerModule;
 using ServerApp_Main.Utils;
 using System.Reflection;
@@ -30,14 +31,12 @@ namespace ServerApp_Main
         {
             try
             {
-                bool init_config = await InitSingle(ConfigMain.InitAsync, "Initializing Configuration", "Failed to initialize Configuration");
-                if (!init_config) return false;
-
-                bool init_webserver = await InitSingle(WebServerMain.InitAsync, "Initializing WebServer", "Failed to initialize WebServer");
-                if (!init_webserver) return false;
-
-                bool init_db = await InitSingle(DBMain.InitAsync, "Initializing DB", "Failed to initialize DB");
-                if (!init_db) return false;
+                if (
+                    !await InitSingle(ConfigMain.InitAsync, "Initializing Configuration", "Failed to initialize Configuration") ||
+                    !await InitSingle(DBMain.InitAsync, "Initializing DB", "Failed to initialize DB") ||
+                    !await InitSingle(WebServerMain.InitAsync, "Initializing WebServer", "Failed to initialize WebServer") ||
+                    !await InitSingle(ReportBuilderMain.InitAsync, "Initializing ReportBuilder", "Failed to initialize ReportBuilder")
+                    ) return false;
             }
             catch(Exception ex)
             {

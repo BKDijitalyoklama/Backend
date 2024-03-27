@@ -22,30 +22,28 @@ namespace EntryHandler
 
         ServerConnection::EntryLogResult result = ServerConnection::NewEntrylog(cardid);
 
-        if(result == ServerConnection::EntryLogResult::ERROR)
-        {
-            DebugError("Couldn't save user entry to server");
-            return;
-        }
 
-        if(result == ServerConnection::EntryLogResult::USERNOTFOUND)
+        switch(result.state)
         {
-            LCD::PrintCenter("Gecersiz Kart");
-            delay(1000);
-            return;
-        }
+            case ServerConnection::EntryLogResult::ENTRYSUCCESS:
+                LCD::PrintCenter("Kaydedildi");
+                Buzzer::Play_UserEntrySound();
+                break;
 
-        if(result == ServerConnection::EntryLogResult::ENTRYSUCCESS)
-        {
-            LCD::Clear();
-            LCD::PrintCenterRow("Kaydedildi", 0);
-            Buzzer::Play_UserEntrySound();
-            delay(2000);
-            return;
-        }
-        else
-        {
-            LCD::PrintCenter("Hata Olustu, Tekrar deneyin");
+            case ServerConnection::EntryLogResult::USERNOTFOUND:
+                LCD::PrintCenter("Gecersiz Kart");
+                break;
+
+            case ServerConnection::EntryLogResult::COOLDOWN:
+                LCD::PrintCenter("Zaten kart basildi");
+            break;
+
+            case ServerConnection::EntryLogResult::ERROR:
+                DebugError("Couldn't save user entry to server");
+                LCD::PrintCenter("Hata Olustu, Tekrar deneyin");
+                break;
+
+            default: return;
         }
         
         delay(2000);

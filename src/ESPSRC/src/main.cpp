@@ -5,9 +5,7 @@
 #include "Feedback/LCD.h"
 #include "EntryHandler.h"
 #include "AsyncDelay.h"
-#include "Network/HTTPServer.h"
 #include "DataSaving/Config.h"
-#include "Network/MailSender.h"
 #include "Feedback/Buzzer.h"
 
 void InitSingle(bool (*initFunc)(), const char* loadingText, const char* errorText)

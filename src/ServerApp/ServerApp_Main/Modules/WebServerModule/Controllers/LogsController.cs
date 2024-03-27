@@ -51,9 +51,9 @@ namespace ServerApp_Main.Modules.WebServerModule.Controllers
                 return;
             }
 
-            //(bool cooldownsuc, bool hascooldown) = await Wrapper.Entrylogs.UserHasCooldown();
+            (bool cooldownsuc, bool hascooldown) = await Wrapper.Entrylogs.UserHasCooldown();
 
-            /*if(!cooldownsuc)
+            if(!cooldownsuc)
             {
                 await ctx.CreateStringResponseAsync("error", 500);
                 return;
@@ -61,10 +61,10 @@ namespace ServerApp_Main.Modules.WebServerModule.Controllers
             
             if(hascooldown) 
             {
-                await ctx.CreateStringResponseAsync("cooldown", 201);
+                await ctx.CreateStringResponseAsync("cooldown", 210);
                 return;
             }
-*/
+
             EntryLog log = new EntryLog()
             {
                 SchoolID = school.SchoolID,

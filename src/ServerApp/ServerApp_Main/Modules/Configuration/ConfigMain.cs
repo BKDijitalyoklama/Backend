@@ -12,6 +12,12 @@ namespace ServerApp_Main.Modules.Configuration
     public class Config
     {
         public string? WebServerUrl { get; set; }
+
+
+        public string? MAIL_SMTPServer { get; set; }
+        public string? MAIL_SMTPPort { get; set; }
+        public string? MAIL_Username { get; set; }
+        public string? MAIL_Password { get; set; }
     }
 
     internal static class ConfigMain
