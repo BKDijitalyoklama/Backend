@@ -36,16 +36,19 @@ namespace RFIDReader
     {
         DebugInfo("RFID Card Detected");
         DebugInfo("ManID: " + String(cardID[0]) + " / CardID: " + String(cardID[1] << 8 | cardID[2]));
-
+        
+        /*
         if(Users::AutoAdd::autoAdd_Active && !Users::AutoAdd::autoAdd_Expire.isExpired())
         {
             Users::AutoAdd::HandleAutoAdd(cardID);
             return;
         }
+        */
 
         if(CheckSpecialCards(cardID)) return;
         
         EntryHandler::HandleEntry(cardID);
+        LCD::PrintCenter("Kart Bekleniyor");
     }
 
     void ClearBuffer()

@@ -8,12 +8,16 @@ namespace DevLogs
 {
     bool Create(String str)
     {
+        return true;
+
+        /*
         File file;
         if(!DataSaving::OpenWrite(Paths::FPATH_DEVLOGS, file)) return false;
 
         if(!file.seek(file.size())) return false;
         file.println('[' + TimeModule::GetDateTimeString() + "]: " + str);
         return true;
+        */
     }
     
 }

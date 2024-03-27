@@ -8,12 +8,13 @@
 #include "DataSaving/EntryLogs.h"
 #include "Feedback/Buzzer.h"
 #include "DataSaving/DevLogs.h"
+#include "Network/ServerConnection.h"
 
 namespace EntryHandler
 {
 
 
-    void HandleEntry(uint8_t cardid[3])
+    void HandleEntry(uint8_t cardid[3]) // TODO: Complete the function
     {
         #ifdef DEBUGINFO
         uint8_t manufacturerID = cardid[0];
@@ -23,22 +24,20 @@ namespace EntryHandler
 
         User user = User();
 
-        if(!Users::GetUserByID(cardid, user))
+        ServerConnection::EntryLogResponse result = ServerConnection::NewEntrylog(cardid);
+
+        if(!result.success || result.code == 500)
         {
-            DevLogs::Create("Invalid Card: " + String((int)UID));
+            DebugError("Couldn't save user entry to server");
+            return;
+        }
+
+        if(result.code == 404)
+        {
             LCD::PrintCenter("Gecersiz Kart");
             delay(1000);
             return;
         }
-
-        if(!EntryLogs::UserEligibleForEntry(cardid))
-        {
-            LCD::PrintCenter("Zaten Giris veya Cikis Yapildi");
-            delay(4000);
-            return;
-        }
-
-        bool suc = EntryLogs::NewEntryLog(EntryLog(cardid, TimeModule::GetEpoch()));
 
         if(suc)
         {
