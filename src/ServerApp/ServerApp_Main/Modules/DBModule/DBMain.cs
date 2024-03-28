@@ -104,8 +104,9 @@ namespace ServerApp_Main.Modules.DBModule
 
                 SQLiteAsyncConnection conn = new SQLiteAsyncConnection(Path.Combine(Paths.Entrylogs_DPath, entryfiledate.ToString("dd-MM-yyyy") + ".db"), SQLiteOpenFlags.Create | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.ReadWrite);
                 await conn.CreateTableAsync<EntryLog>();
+                await conn.CreateTableAsync<SchoolFeedbackResult>();
 
-                for(int j = 0; j < entrylogs.Length; j+= 11)
+                for (int j = 0; j < entrylogs.Length; j+= 11)
                 {
                     byte[] log = new byte[11];
 

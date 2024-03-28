@@ -32,6 +32,8 @@ namespace ServerApp_Main.Modules.DBModule.Wrappers
                     {
                         SQLiteAsyncConnection conn = new SQLiteAsyncConnection(todaysFile, SQLiteOpenFlags.Create | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.ReadWrite);
                         await conn.CreateTableAsync<EntryLog>();
+                        await conn.CreateTableAsync<SchoolFeedbackResult>();
+
                         if (DBMain.DailyEntryLogConnection != null) await DBMain.DailyEntryLogConnection.CloseAsync();
 
                         DBMain.DailyEntryLogConnection = conn;

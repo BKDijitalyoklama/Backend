@@ -13,6 +13,7 @@ namespace ServerApp_Main.Modules.DBModule.Models.EntrylogsDB
         [Indexed]
         public uint UserID { get; set; }
 
+        [Indexed]
         public uint SchoolID { get; set; }
 
         public DateTime DT { get; set; }
