@@ -7,6 +7,7 @@
 #include "AsyncDelay.h"
 #include "DataSaving/Config.h"
 #include "Feedback/Buzzer.h"
+#include "Network/OTA.h"
 
 void InitSingle(bool (*initFunc)(), const char* loadingText, const char* errorText)
 {
@@ -41,6 +42,8 @@ void setup()
   InitSingle(Config::Initialize, "Konfigrasyon Aliniyor", "Konfigrasyon Hatasi");
 
   InitSingle(NetworkConnection::Initialize, "WiFi Baglantisi Kuruluyor", "WiFi Baglanti Hatasi");
+
+  InitSingle(OTA::Initialize, "OTA Hazirlaniyor", "OTA Hatasi");
   
   //InitSingle(HTTPServer::Initialize, "Web Sunucusu Olusturuluyor", "Web Sunucu Hatasi");
 
