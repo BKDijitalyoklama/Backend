@@ -25,7 +25,8 @@ namespace EntryHandler
         switch(result.state)
         {
             case ServerConnection::EntryLogResult::ENTRYSUCCESS:
-                LCD::PrintCenter("Kaydedildi");
+                LCD::PrintCenterRow(result.namesurname, 0);
+                LCD::PrintCenterRow("Kaydedildi",1);
                 Buzzer::Play_UserEntrySound();
                 break;
 
