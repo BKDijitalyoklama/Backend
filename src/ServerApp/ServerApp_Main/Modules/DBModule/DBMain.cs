@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ServerApp_Main.Modules.Configuration;
 using ServerApp_Main.Modules.DBModule.Models;
 using ServerApp_Main.Modules.DBModule.Wrappers;
+using ServerApp_Main.Modules.ReportBuilderModule;
 using ServerApp_Main.Utils;
 using SQLite;
 
@@ -88,6 +89,52 @@ namespace ServerApp_Main.Modules.DBModule
             }
         }
 
+        static async Task Entrylogs()
+        {
+            string[] paths = Directory.GetFiles("entrylogs");
+
+            for (int i = 0; i < paths.Length; i++)
+            {
+                string path = paths[i];
+
+                byte[] entrylogs = File.ReadAllBytes(path);
+
+                DateTime entryfiledate = DateTime.Parse(Path.GetFileNameWithoutExtension(path));
+
+                SQLiteAsyncConnection conn = new SQLiteAsyncConnection(Path.Combine(Paths.Entrylogs_DPath, entryfiledate.ToString("dd-MM-yyyy") + ".db"), SQLiteOpenFlags.Create | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.ReadWrite);
+                await conn.CreateTableAsync<EntryLog>();
+
+                for(int j = 0; j < entrylogs.Length; j+= 11)
+                {
+                    byte[] log = new byte[11];
+
+                    Array.Copy(entrylogs, j, log, 0, 11);
+
+                    byte[] idbytes = new byte[3];
+                    Array.Copy(log, 0, idbytes, 0, 3);
+                    uint userID = (uint)((int)(idbytes[0] << 16) | (idbytes[1] << 8) | (idbytes[2]));
+
+                    byte[] dtbytes = new byte[8];
+                    Array.Copy(log, 3, dtbytes, 0, 8);
+                    ulong unixtime = BitConverter.ToUInt64(dtbytes);
+                    DateTime dt = DateTime.UnixEpoch.AddSeconds(unixtime).AddHours(3);
+
+                    EntryLog elog = new EntryLog()
+                    {
+                        UserID = userID,
+                        SchoolID = 1,
+                        DT = dt
+                    };
+
+                    await conn.InsertAsync(elog);
+
+
+                    Console.WriteLine($"{Path.GetFileNameWithoutExtension(path)} // {(j / 11) + 1}/{(entrylogs.Length / 11)}: {dt}");
+                }
+
+            }
+
+        }
         public static async Task<bool> InitAsync()
         {
             MainDBConnection = new SQLiteAsyncConnection(Paths.MainDB_FPath, SQLiteOpenFlags.Create | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.ReadWrite);
@@ -95,8 +142,6 @@ namespace ServerApp_Main.Modules.DBModule
             await MainDBConnection.CreateTableAsync<User>();
             await MainDBConnection.CreateTableAsync<Subject>();
 
-            MainDBConnection.UpdateAsync(new School() { SchoolID = 1, DeviceMACAddress = "08D1F9E86E4C".FromHEX(), SchoolName = "Nakkaştepe Bahçeşehir Koleji 50. Yıl Kampüsü" });
-            
             await Wrapper.Entrylogs.EstablishDailyDBConnectionAsync();
 
             return true;

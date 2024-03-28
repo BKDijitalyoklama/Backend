@@ -83,9 +83,10 @@ namespace ServerApp_Main.Modules.ReportBuilderModule
                         line += $"{entry_in?.DT.ToString("HH:mm")}, {entry_out?.DT.ToString("HH:mm")}";
                     }
 
-                    line += "\r\n";
 
                 }
+
+                line += "\r\n";
 
                 return line;
             }
