@@ -1,4 +1,4 @@
-﻿using ServerApp_Main.Modules.DBModule.Models;
+﻿using ServerApp_Main.Modules.DBModule.Models.MainDB;
 using ServerApp_Main.Utils;
 using System;
 using System.Collections.Generic;

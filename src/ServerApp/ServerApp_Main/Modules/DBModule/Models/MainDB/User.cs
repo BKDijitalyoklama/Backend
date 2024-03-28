@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServerApp_Main.Modules.DBModule.Models
+namespace ServerApp_Main.Modules.DBModule.Models.MainDB
 {
     [Table("users")]
     internal class User

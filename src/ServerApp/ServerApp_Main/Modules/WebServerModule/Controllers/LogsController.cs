@@ -1,6 +1,5 @@
 ﻿using ServerApp_Main.Modules.DBModule;
 using ServerApp_Main.Modules.DBModule.Wrappers;
-using ServerApp_Main.Modules.DBModule.Models;
 using ServerApp_Main.Utils;
 using SimpleWebServer.Attributes;
 using SimpleWebServer.Extensions;
@@ -12,6 +11,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using ServerApp_Main.Modules.WebServerModule.Utils;
+using ServerApp_Main.Modules.DBModule.Models.MainDB;
+using ServerApp_Main.Modules.DBModule.Models.EntrylogsDB;
 
 namespace ServerApp_Main.Modules.WebServerModule.Controllers
 {

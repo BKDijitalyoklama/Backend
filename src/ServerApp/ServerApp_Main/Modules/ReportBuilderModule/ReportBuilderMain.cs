@@ -7,9 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using ServerApp_Main.Utils;
 using ServerApp_Main.Modules.Configuration;
-using ServerApp_Main.Modules.DBModule.Models;
 using ServerApp_Main.Modules.DBModule;
 using ServerApp_Main.Modules.DBModule.Wrappers;
+using ServerApp_Main.Modules.DBModule.Models.MainDB;
+using ServerApp_Main.Modules.DBModule.Models.EntrylogsDB;
 
 namespace ServerApp_Main.Modules.ReportBuilderModule
 {

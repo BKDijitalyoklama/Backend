@@ -1,5 +1,5 @@
 ﻿using ServerApp_Main.Modules.Configuration;
-using ServerApp_Main.Modules.DBModule.Models;
+using ServerApp_Main.Modules.DBModule.Models.EntrylogsDB;
 using ServerApp_Main.Utils;
 using SQLite;
 using System;
