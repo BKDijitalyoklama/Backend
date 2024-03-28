@@ -15,6 +15,22 @@ namespace ServerApp_Main.Modules.ReportBuilderModule
 {
     internal static class ReportBuilderMain
     {
+
+        public static async Task<bool> InitAsync()
+        {
+            Client = new SmtpClient(ConfigMain.config?.MAIL_SMTPServer)
+            {
+                Port = 587,
+                Credentials = new NetworkCredential(ConfigMain.config?.MAIL_Username, ConfigMain.config?.MAIL_Password),
+                EnableSsl = true,
+            };
+
+            
+
+            return true;
+        }
+
+
         class UserEntrylogConnection
         {
             private string namesurname;
@@ -25,7 +41,7 @@ namespace ServerApp_Main.Modules.ReportBuilderModule
 
             public UserEntrylogConnection(uint userID)
             {
-                
+
                 (bool userSuccess, User? user) = Wrapper.Users.GetUserByIDAsync(userID).Result;
                 if (!userSuccess)
                 {
@@ -60,7 +76,7 @@ namespace ServerApp_Main.Modules.ReportBuilderModule
             {
                 string line = $"{namesurname}, {subjectname}, ";
 
-                if(entry1 != null && entry2 != null)
+                if (entry1 != null && entry2 != null)
                 {
                     EntryLog entry_in = entry1.DT < entry2.DT ? entry1 : entry2;
                     EntryLog entry_out = entry1.DT > entry2.DT ? entry1 : entry2;
@@ -97,21 +113,21 @@ namespace ServerApp_Main.Modules.ReportBuilderModule
             string CSV = "Ad Soyad, Branş, Giriş, Çıkış\r\n";
 
             (bool entrylogssuc, List<EntryLog>? entrylogs) = await Wrapper.Entrylogs.GetEntryLogs(schoolID, __date);
-            if(!entrylogssuc || entrylogs == null)
+            if (!entrylogssuc || entrylogs == null)
             {
                 return (false, null);
             }
 
             Dictionary<uint, UserEntrylogConnection> userConnections = new Dictionary<uint, UserEntrylogConnection>();
 
-            foreach(EntryLog entry in entrylogs)
+            foreach (EntryLog entry in entrylogs)
             {
                 if (!userConnections.ContainsKey(entry.UserID)) userConnections[entry.UserID] = new UserEntrylogConnection(entry.UserID);
 
                 userConnections[entry.UserID].AddEntry(entry);
             }
 
-            foreach(UserEntrylogConnection connection in userConnections.Values)
+            foreach (UserEntrylogConnection connection in userConnections.Values)
             {
                 CSV += connection.GetCSVLine();
             }
@@ -141,25 +157,42 @@ namespace ServerApp_Main.Modules.ReportBuilderModule
                 await Client.SendMailAsync(mail);
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Log("Mail Exception: " + ex.Message, Logger.LogLevel.Error);
                 return false;
             }
-            
+
         }
 
 
-        public static async Task<bool> InitAsync()
+        static async Task BuildExistingEntrylogs()
         {
-            Client = new SmtpClient(ConfigMain.config?.MAIL_SMTPServer)
-            {
-                Port = 587,
-                Credentials = new NetworkCredential(ConfigMain.config?.MAIL_Username, ConfigMain.config?.MAIL_Password),
-                EnableSsl = true,
-            };
+            string[] dbpaths = Directory.GetFiles(Paths.Entrylogs_DPath);
 
-            return true;
+            if (!Directory.Exists("csvfiles")) Directory.CreateDirectory("csvfiles");
+
+            Logger.Log(DateTime.Now.ToShortDateString());
+
+            foreach (string path in dbpaths)
+            {
+                DateTime date = DateTime.Parse(Path.GetFileNameWithoutExtension(path).Replace('-', '.'));
+
+                (bool suc, string? csv) = await BuildCSV(1, date);
+
+                if (!suc || csv == null)
+                {
+                    Logger.Log($"Couldnt build CSV for {path}", Logger.LogLevel.Error);
+                    continue;
+                }
+
+                string csvfilename = "csvfiles\\" + date.ToString("dd-MM-yyyy") + ".csv";
+                if (!File.Exists(csvfilename)) File.Create(csvfilename).Close();
+
+                File.WriteAllText(csvfilename, csv);
+
+                Logger.Log("CSV Success " + date.ToString("dd-MM-yyyy"));
+            }
         }
     }
 }
