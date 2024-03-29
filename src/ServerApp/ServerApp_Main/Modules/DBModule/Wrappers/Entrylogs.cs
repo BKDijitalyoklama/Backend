@@ -61,8 +61,6 @@ namespace ServerApp_Main.Modules.DBModule.Wrappers
 
             public static async Task<(bool, List<EntryLog>?)> GetEntryLogs(uint schoolID, DateTime? __date = null)
             {
-                if (DBMain.MainDBConnection == null) { Logger.Log("DB DailyLogs Not initialized", Logger.LogLevel.Error); return (false, null); }
-
                 try
                 {
 
@@ -104,7 +102,7 @@ namespace ServerApp_Main.Modules.DBModule.Wrappers
                 try
                 {
                     await EstablishDailyDBConnectionAsync();
-                    if (DBMain.DailyEntryLogConnection == null) { Logger.Log("DB Not initialized", Logger.LogLevel.Error); return false; }
+                    if (DBMain.DailyEntryLogConnection == null) { Logger.Log("DB DailyLogs Not initialized", Logger.LogLevel.Error); return false; }
 
                     return await DBMain.DailyEntryLogConnection.InsertAsync(elog) == 1;
                 }

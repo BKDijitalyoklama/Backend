@@ -16,6 +16,18 @@ namespace ServerApp_Main.Modules.DBModule
 {
     internal static class DBMain
     {
+        public static async Task<bool> InitAsync()
+        {
+            MainDBConnection = new SQLiteAsyncConnection(Paths.MainDB_FPath, SQLiteOpenFlags.Create | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.ReadWrite);
+            await MainDBConnection.CreateTableAsync<School>();
+            await MainDBConnection.CreateTableAsync<User>();
+            await MainDBConnection.CreateTableAsync<Subject>();
+
+            await Wrapper.Entrylogs.EstablishDailyDBConnectionAsync();
+
+            return true;
+        }
+
         public static SQLiteAsyncConnection? MainDBConnection;
 
         public static SQLiteAsyncConnection? DailyEntryLogConnection;
@@ -137,17 +149,7 @@ namespace ServerApp_Main.Modules.DBModule
             }
 
         }
-        public static async Task<bool> InitAsync()
-        {
-            MainDBConnection = new SQLiteAsyncConnection(Paths.MainDB_FPath, SQLiteOpenFlags.Create | SQLiteOpenFlags.FullMutex | SQLiteOpenFlags.ReadWrite);
-            await MainDBConnection.CreateTableAsync<School>();
-            await MainDBConnection.CreateTableAsync<User>();
-            await MainDBConnection.CreateTableAsync<Subject>();
-
-            await Wrapper.Entrylogs.EstablishDailyDBConnectionAsync();
-
-            return true;
-        }
+        
 
     }
 }

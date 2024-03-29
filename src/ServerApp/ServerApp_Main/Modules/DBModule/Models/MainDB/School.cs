@@ -18,5 +18,7 @@ namespace ServerApp_Main.Modules.DBModule.Models.MainDB
         public byte[] DeviceMACAddress { get; set; } = { };
 
         public string SchoolName { get; set; } = "";
+
+        public string ReportRecipients { get; set; } = "";
     }
 }

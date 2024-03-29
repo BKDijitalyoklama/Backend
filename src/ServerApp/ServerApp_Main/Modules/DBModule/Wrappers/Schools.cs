@@ -56,6 +56,26 @@ namespace ServerApp_Main.Modules.DBModule.Wrappers
                     return (false, null);
                 }
             }
+
+            public static async Task<(bool,List<School>?)> GetAllSchools()
+            {
+                try
+                {
+                    if (DBMain.MainDBConnection == null) { Logger.Log("DB Not initialized", Logger.LogLevel.Error); return (false, null); }
+                    return (true, await DBMain.MainDBConnection.Table<School>().ToListAsync());
+
+                }
+                catch (SQLite.SQLiteException e)
+                {
+                    Logger.Log("DBErr: " + e.Message, Logger.LogLevel.Error);
+                    return (false, null);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("Err: " + ex.Message, Logger.LogLevel.Error);
+                    return (false, null);
+                }
+            }
         }
     }
 }

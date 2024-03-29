@@ -18,6 +18,8 @@ namespace ServerApp_Main.Modules.Configuration
         public string? MAIL_SMTPPort { get; set; }
         public string? MAIL_Username { get; set; }
         public string? MAIL_Password { get; set; }
+
+        public int[][]? DailyReportTimes { get; set; }
     }
 
     internal static class ConfigMain
