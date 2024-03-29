@@ -11,6 +11,9 @@ namespace ServerApp_Main
     {
         static async Task Main(string[] args)
         {
+            Version? version = Assembly.GetExecutingAssembly().GetName().Version;
+            if (version == null) Logger.Log("APP Started (V Unknown)");
+            else Logger.Log($"APP Started (V{version.Major}.{version.Minor}.{version.Build})");
 
             if (!await InitModules())
             {
