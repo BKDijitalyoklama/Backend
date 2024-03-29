@@ -11,7 +11,6 @@ namespace ServerApp_Main
     {
         static async Task Main(string[] args)
         {
-            Logger.Log("APP Started, Initializing");
 
             if (!await InitModules())
             {
