@@ -33,6 +33,28 @@ namespace ServerApp_Main.Modules.DBModule.Wrappers
                     return (false, null);
                 }
             }
+            public static async Task<(bool, List<User>?)> GetAllUsers(int schoolID = -1)
+            {
+                try
+                {
+                    if (DBMain.MainDBConnection == null) { Logger.Log("DB Not initialized", Logger.LogLevel.Error); return (false, null); }
+
+                    List<User>? users;
+                    if (schoolID == -1) users = await DBMain.MainDBConnection.Table<User>().ToListAsync();
+                    else users = await DBMain.MainDBConnection.Table<User>().Where(x => x.SchoolID == schoolID).ToListAsync();
+                    return (true, users);
+                }
+                catch (SQLite.SQLiteException e)
+                {
+                    Logger.Log("DBErr: " + e.Message, Logger.LogLevel.Error);
+                    return (false, null);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("Err: " + ex.Message, Logger.LogLevel.Error);
+                    return (false, null);
+                }
+            }
         }
     }
 }

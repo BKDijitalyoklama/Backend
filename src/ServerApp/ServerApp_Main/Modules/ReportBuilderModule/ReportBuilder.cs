@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
+using static ServerApp_Main.Modules.DBModule.Wrappers.Wrapper;
 
 namespace ServerApp_Main.Modules.ReportBuilderModule
 {
@@ -56,60 +57,72 @@ namespace ServerApp_Main.Modules.ReportBuilderModule
                 if (entry1 == null) entry1 = entry;
                 else entry2 = entry;
             }
+            
+            private string GetCSVLineFromData(DateTime? entry_in, DateTime? entry_out)
+            {
+                string str_in = entry_in?.ToString("HH:mm") ?? "-";
+                string str_out = entry_out?.ToString("HH:mm") ?? "-";
+
+                return $"{namesurname}, {subjectname}, {str_in}, {str_out}\n";
+            }
 
             public string GetCSVLine()
             {
-                string line = $"{namesurname}, {subjectname}, ";
+                DateTime? entrydt_in = null;
+                DateTime? entrydt_out = null;
+
 
                 if (entry1 != null && entry2 != null)
                 {
                     EntryLog entry_in = entry1.DT < entry2.DT ? entry1 : entry2;
                     EntryLog entry_out = entry1.DT > entry2.DT ? entry1 : entry2;
 
-                    line += $"{entry_in.DT.ToString("HH:mm")}, {entry_out.DT.ToString("HH:mm")}";
+                    entrydt_in = entry_in.DT;
+                    entrydt_out = entry_out.DT;
                 }
                 else
                 {
                     EntryLog? entry = entry1 ?? entry2;
 
-                    if (entry == null)
-                    {
-                        line += "-,-";
-                    }
-                    else
+                    if(entry != null)
                     {
                         EntryLog? entry_in = entry.DT.TimeOfDay <= new TimeSpan(12, 30, 0) ? entry : null;
                         EntryLog? entry_out = entry.DT.TimeOfDay > new TimeSpan(12, 30, 0) ? entry : null;
 
-                        line += $"{entry_in?.DT.ToString("HH:mm")}, {entry_out?.DT.ToString("HH:mm")}";
+                        entrydt_in = entry_in?.DT;
+                        entrydt_out = entry_out?.DT;
                     }
 
 
                 }
 
-                line += "\r\n";
 
-                return line;
+                return GetCSVLineFromData(entrydt_in, entrydt_out);
             }
         }
 
         public static async Task<(bool, string?)> BuildCSV(uint schoolID, DateTime? __date = null)
         {
-            string CSV = "Ad Soyad, Branş, Giriş, Çıkış\r\n";
+            string CSV = "AD SOYAD, BRANŞ, GİRİŞ, ÇIKIŞ\r\n";
 
             (bool entrylogssuc, List<EntryLog>? entrylogs) = await Wrapper.Entrylogs.GetEntryLogs(schoolID, __date);
-            if (!entrylogssuc || entrylogs == null)
+            (bool userssuc, List<User>? users) = await Wrapper.Users.GetAllUsers((int)schoolID);
+            if (!entrylogssuc || entrylogs == null || !userssuc || users == null)
             {
                 return (false, null);
             }
 
             Dictionary<uint, UserEntrylogConnection> userConnections = new Dictionary<uint, UserEntrylogConnection>();
 
-            foreach (EntryLog entry in entrylogs)
+            foreach (User user in users)
             {
-                if (!userConnections.ContainsKey(entry.UserID)) userConnections[entry.UserID] = new UserEntrylogConnection(entry.UserID);
+                userConnections.Add(user.ID, new UserEntrylogConnection(user.ID));
+            }
 
-                userConnections[entry.UserID].AddEntry(entry);
+            foreach(EntryLog entrylog in entrylogs)
+            {
+                if(userConnections.ContainsKey(entrylog.UserID))
+                userConnections[entrylog.UserID].AddEntry(entrylog);
             }
 
             foreach (UserEntrylogConnection connection in userConnections.Values)
@@ -152,7 +165,7 @@ namespace ServerApp_Main.Modules.ReportBuilderModule
         }
 
 
-        static async Task BuildExistingEntrylogs()
+        public static async Task BuildExistingEntrylogs()
         {
             string[] dbpaths = Directory.GetFiles(Paths.Entrylogs_DPath);
 
