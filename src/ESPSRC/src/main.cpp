@@ -26,6 +26,7 @@ void InitSingle(bool (*initFunc)(), const char* loadingText, const char* errorTe
 
 //AsyncDelay timeDisplayTimer = AsyncDelay();
 AsyncDelay connectionCheckTimer = AsyncDelay();
+AsyncDelay LCDRefreshTimer = AsyncDelay();
 
 //AsyncDelay datetimeUpdateTimer = AsyncDelay();
 
@@ -57,6 +58,8 @@ void setup()
 
   //timeDisplayTimer.start(1000, AsyncDelay::MILLIS);
   connectionCheckTimer.start(1000, AsyncDelay::MILLIS);
+  
+  LCDRefreshTimer.start(1800000, AsyncDelay::MILLIS);
   //datetimeUpdateTimer.start(1000 * 60 * 60, AsyncDelay::MILLIS);
   
   DebugInfo("Started");
@@ -90,6 +93,12 @@ void loop()
   {
     NetworkConnection::EnsureConnection();
     connectionCheckTimer.start(1000, AsyncDelay::MILLIS);
+  }
+
+  if(LCDRefreshTimer.isExpired())
+  {
+    LCD::Refresh();
+    LCDRefreshTimer.start(1800000, AsyncDelay::MILLIS);
   }
 
   /*
