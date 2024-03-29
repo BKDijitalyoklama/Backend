@@ -118,14 +118,14 @@ namespace ServerApp_Main.Modules.DBModule.Wrappers
                 }
             }
         
-            public static async Task<(bool, bool)> UserHasCooldown()
+            public static async Task<(bool, bool)> CheckUserCooldown(uint userID)
             {
                 try
                 {
                     await EstablishDailyDBConnectionAsync();
                     if (DBMain.DailyEntryLogConnection == null) { Logger.Log("DB Not initialized", Logger.LogLevel.Error); return (false, false); }
                     DateTime limit = DateTime.Now - TimeSpan.FromMinutes(1);
-                    return (true, (await DBMain.DailyEntryLogConnection.Table<EntryLog>().CountAsync(x => x.DT > limit)) > 0);
+                    return (true, (await DBMain.DailyEntryLogConnection.Table<EntryLog>().CountAsync(x => x.UserID == userID && x.DT > limit)) > 0);
                 }
                 catch (SQLite.SQLiteException e)
                 {

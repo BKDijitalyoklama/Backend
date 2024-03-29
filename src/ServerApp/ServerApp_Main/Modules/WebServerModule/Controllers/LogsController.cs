@@ -52,7 +52,7 @@ namespace ServerApp_Main.Modules.WebServerModule.Controllers
                 return;
             }
 
-            (bool cooldownsuc, bool hascooldown) = await Wrapper.Entrylogs.UserHasCooldown();
+            (bool cooldownsuc, bool hascooldown) = await Wrapper.Entrylogs.CheckUserCooldown(user.ID);
 
             if(!cooldownsuc)
             {
