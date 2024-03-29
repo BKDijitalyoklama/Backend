@@ -13,7 +13,7 @@ namespace ServerConnection
         bool success;
     };
 
-    const char* root = "http://10.134.100.16:80";
+    const char* root = "http://10.134.100.56:80";
 
     String GetMacAddress()
     {
