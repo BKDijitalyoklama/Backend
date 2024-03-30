@@ -48,6 +48,7 @@ namespace ServerApp_Main.Modules.WebServerModule.Controllers
 
             if(user == null)
             {
+                Logger.Log($"New Entry Log // {userID} // not found");
                 await ctx.CreateStringResponseAsync("usernotfound", 404);
                 return;
             }
@@ -62,6 +63,7 @@ namespace ServerApp_Main.Modules.WebServerModule.Controllers
             
             if(hascooldown) 
             {
+                Logger.Log($"New Entry Log // {userID} // cooldown");
                 await ctx.CreateStringResponseAsync("cooldown", 210);
                 return;
             }
@@ -73,7 +75,7 @@ namespace ServerApp_Main.Modules.WebServerModule.Controllers
                 UserID = userID
             };
 
-            Logger.Log($"New Entry Log // {userID}");
+            Logger.Log($"New Entry Log // {userID} // success");
             if(await Wrapper.Entrylogs.NewEntryLogAsync(log)) await ctx.CreateStringResponseAsync(user.NameSurname, 200);
             else await ctx.CreateStringResponseAsync("error", 500);
         }
