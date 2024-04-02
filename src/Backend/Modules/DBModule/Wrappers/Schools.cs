@@ -76,6 +76,37 @@ namespace ServerApp_Main.Modules.DBModule.Wrappers
                     return (false, null);
                 }
             }
+
+            public static async Task<(bool, bool)> UpdateSchoolLastSeenBySchoolID(uint ID, DateTime dt)
+            {
+                try
+                {
+                    if (DBMain.MainDBConnection == null) { Logger.Log("DB Not initialized", Logger.LogLevel.Error); return (false, false); }
+
+                    (bool schoolsuc, School? school) = await GetSchoolByID(ID);
+                    if (!schoolsuc || school == null) return (false, false);
+
+                    school.LastSeen = dt;
+
+
+                    int c = await DBMain.MainDBConnection.UpdateAsync(school);
+
+
+
+                    return (true, c == 1);
+                }
+                catch (SQLite.SQLiteException e)
+                {
+                    Logger.Log("DBErr: " + e.Message, Logger.LogLevel.Error);
+                    return (false, false);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log("Err: " + ex.Message, Logger.LogLevel.Error);
+                    return (false, false);
+                }
+
+            }
         }
     }
 }

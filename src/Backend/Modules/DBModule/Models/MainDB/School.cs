@@ -20,5 +20,7 @@ namespace ServerApp_Main.Modules.DBModule.Models.MainDB
         public string SchoolName { get; set; } = "";
 
         public string ReportRecipients { get; set; } = "";
+
+        public DateTime LastSeen { get; set; }
     }
 }
